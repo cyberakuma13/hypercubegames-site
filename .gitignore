@@ -1,0 +1,11 @@
+# Uncompressed originals — superseded by the .jpg versions the site actually uses.
+# Kept on disk for future re-cropping, excluded from the deployed site.
+assets/ss-hero.png
+assets/ss-pilots.png
+assets/lr-home.png
+assets/lr-gameplay.png
+
+# Art copied in during the build but not used on the page.
+assets/ss-logo.png
+assets/db-card2.jpg
+assets/db-card3.jpg

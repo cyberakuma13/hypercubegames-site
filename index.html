@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hypercube Games — Board games and video games from Dublin, California</title>
+<meta name="description" content="Hypercube Games, LLC is an independent game studio in Dublin, California. Makers of Star Squadron, Lost Robot, and Dungeon Brawler.">
+<meta property="og:title" content="Hypercube Games">
+<meta property="og:description" content="An independent game studio in Dublin, California. Tabletop and digital.">
+<meta property="og:image" content="assets/ss-hero.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/lr-icon.png">
+<style>
+  :root{
+    --bg:#0b0d14;
+    --bg-2:#12151f;
+    --panel:#171b28;
+    --line:#252b3d;
+    --ink:#eef1f8;
+    --ink-2:#a5adc4;
+    --ink-3:#6d768f;
+    --accent:#ff9d2e;
+    --accent-2:#ffc978;
+    --max:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,13,20,.82);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.2px;color:var(--ink)}
+  .brand:hover{text-decoration:none}
+  .cube{
+    width:22px;height:22px;flex:none;
+    border:2px solid var(--accent);
+    transform:rotate(45deg);
+    position:relative;
+  }
+  .cube::after{
+    content:"";position:absolute;inset:4px;
+    border:2px solid var(--accent-2);opacity:.55;
+  }
+  .nav nav{display:flex;gap:28px;font-size:14.5px}
+  .nav nav a{color:var(--ink-2)}
+  .nav nav a:hover{color:var(--ink);text-decoration:none}
+  @media(max-width:620px){ .nav nav{gap:18px;font-size:13.5px} .brand span{display:none} }
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero-bg{
+    position:absolute;inset:0;
+    background:url(assets/ss-hero.jpg) center 40%/cover no-repeat;
+    opacity:.34;
+    filter:saturate(.9);
+  }
+  .hero-bg::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(11,13,20,.55) 0%,rgba(11,13,20,.8) 55%,var(--bg) 100%);
+  }
+  .hero-in{position:relative;padding:112px 0 96px;max-width:720px}
+  .kicker{
+    display:inline-block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);border:1px solid rgba(255,157,46,.35);
+    padding:5px 12px;border-radius:99px;margin-bottom:22px;
+  }
+  h1{
+    font-size:clamp(38px,6.2vw,62px);line-height:1.05;margin:0 0 20px;
+    letter-spacing:-1.4px;font-weight:800;
+  }
+  .lede{font-size:clamp(17px,2.2vw,20px);color:var(--ink-2);margin:0 0 32px;max-width:620px}
+  .btn{
+    display:inline-block;padding:13px 26px;border-radius:8px;font-weight:650;font-size:15px;
+    background:var(--accent);color:#1a1205;border:1px solid var(--accent);
+  }
+  .btn:hover{background:var(--accent-2);border-color:var(--accent-2);text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--ink-3);background:rgba(255,255,255,.04)}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap}
+
+  /* ---------- sections ---------- */
+  section{padding:88px 0}
+  section + section{border-top:1px solid var(--line)}
+  .sec-head{margin-bottom:44px;max-width:640px}
+  .sec-head h2{font-size:clamp(26px,3.6vw,34px);margin:0 0 10px;letter-spacing:-.6px;font-weight:750}
+  .sec-head p{color:var(--ink-2);margin:0}
+
+  /* ---------- game cards ---------- */
+  .game{
+    display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;margin-bottom:28px;
+  }
+  .game.flip .game-art{order:2}
+  .game-art{background:#0d1018;height:100%;display:flex;align-items:center;justify-content:center;padding:0;min-width:0}
+  .game-body{min-width:0}
+  .game-art img{width:100%;height:100%;object-fit:cover;min-height:280px}
+  .game-body{padding:40px 40px 40px 4px}
+  .game.flip .game-body{padding:40px 4px 40px 40px}
+  @media(max-width:820px){
+    .game{grid-template-columns:1fr;gap:0}
+    .game.flip .game-art{order:0}
+    .game-body,.game.flip .game-body{padding:32px 28px}
+    .game-art img{min-height:200px;max-height:320px}
+  }
+  @media(max-width:620px){
+    .shots,.cards-strip{
+      display:grid;gap:10px;padding:20px;overflow:visible;height:auto;
+    }
+    .shots{grid-template-columns:1fr 1fr}
+    .cards-strip{grid-template-columns:repeat(3,1fr);gap:8px}
+    .shots img,.cards-strip img{width:100%;max-height:none;max-width:100%}
+    .kicker{font-size:11px;letter-spacing:.1em}
+  }
+  .tag{
+    display:inline-block;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;
+    padding:4px 10px;border-radius:99px;margin-bottom:14px;font-weight:650;
+  }
+  .tag.live{background:rgba(255,157,46,.14);color:var(--accent-2);border:1px solid rgba(255,157,46,.3)}
+  .tag.dev{background:rgba(120,180,255,.12);color:#8fc2ff;border:1px solid rgba(120,180,255,.28)}
+  .tag.out{background:rgba(255,255,255,.06);color:var(--ink-2);border:1px solid var(--line)}
+  .game h3{font-size:27px;margin:0 0 6px;letter-spacing:-.4px;font-weight:750}
+  .game .sub{color:var(--ink-3);font-size:14px;margin:0 0 16px}
+  .game p{color:var(--ink-2);margin:0 0 20px}
+  .game ul{color:var(--ink-2);margin:0 0 22px;padding-left:20px}
+  .game ul li{margin-bottom:5px}
+
+  /* screenshot strip */
+  .shots{
+    display:flex;gap:14px;padding:26px;background:#0d1018;overflow-x:auto;
+    min-width:0;max-width:100%;justify-content:safe center;width:100%;
+  }
+  .shots img{
+    width:180px;flex:none;border-radius:12px;border:1px solid var(--line);
+    min-height:0;height:auto;object-fit:contain;
+  }
+  .cards-strip{
+    display:flex;gap:12px;padding:26px;overflow-x:auto;
+    align-items:center;justify-content:safe center;height:100%;width:100%;min-width:0;max-width:100%;
+    background:radial-gradient(ellipse at center,#1b2132 0%,#0d1018 72%);
+  }
+  .cards-strip img{
+    width:148px;flex:none;border-radius:8px;height:auto;min-height:0;object-fit:contain;
+    box-shadow:0 10px 26px rgba(0,0,0,.6);
+  }
+  .cards-strip img:nth-child(odd){transform:rotate(-2.5deg)}
+  .cards-strip img:nth-child(even){transform:rotate(2.5deg)}
+
+  /* ---------- archive ---------- */
+  .archive{
+    background:var(--bg-2);border:1px solid var(--line);border-radius:14px;
+    padding:30px 32px;display:flex;gap:22px;align-items:flex-start;
+  }
+  .archive .yr{
+    font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.1em;
+    border:1px solid rgba(255,157,46,.3);border-radius:6px;padding:6px 11px;flex:none;
+  }
+  .archive h3{margin:0 0 6px;font-size:19px;font-weight:700}
+  .archive p{margin:0;color:var(--ink-2);font-size:15px}
+  @media(max-width:620px){ .archive{flex-direction:column;gap:14px} }
+
+  /* ---------- studio / support ---------- */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  @media(max-width:820px){ .cols{grid-template-columns:1fr;gap:40px} }
+  .cols p{color:var(--ink-2)}
+  .info{list-style:none;padding:0;margin:22px 0 0;font-size:15px}
+  .info li{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:16px}
+  .info .k{color:var(--ink-3);width:104px;flex:none}
+  .info .v{color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);padding:36px 0;color:var(--ink-3);font-size:14px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .foot a{color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="cube" aria-hidden="true"></span><span>Hypercube Games</span></a>
+    <nav>
+      <a href="#games">Games</a>
+      <a href="#studio">Studio</a>
+      <a href="#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero-in">
+      <span class="kicker">Independent studio · Dublin, California</span>
+      <h1>We make games you play at a table, and games you play on a screen.</h1>
+      <p class="lede">Hypercube Games has been designing and shipping games since 2011 — tactical space combat, cozy puzzles, and card games full of bad decisions.</p>
+      <div class="btn-row">
+        <a class="btn" href="#games">See our games</a>
+        <a class="btn ghost" href="#support">Get in touch</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="games">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Our games</h2>
+      <p>Three in the world right now — one heading to Kickstarter, one in development, one on the shelf.</p>
+    </div>
+
+    <!-- Star Squadron -->
+    <article class="game">
+      <div class="game-art"><img src="assets/ss-pilots.jpg" alt="Star Squadron pilots resting beside their fighters at sunset"></div>
+      <div class="game-body">
+        <span class="tag live">Coming to Kickstarter</span>
+        <h3>Star Squadron</h3>
+        <p class="sub">Tactical starfighter combat · Tabletop</p>
+        <p>A hex-based dogfighting board game where every pilot plans their maneuver in secret, then everyone moves at once. Bank, break, loop and slide through asteroid fields and nebulae — and hope you guessed right about where your opponent was going.</p>
+        <ul>
+          <li>Simultaneous secret maneuver planning</li>
+          <li>Asymmetrical factions with their own ships and abilities</li>
+          <li>Energy management across weapons, engines, and shields</li>
+        </ul>
+        <a class="btn" href="https://www.launchoracle.com/hypercube-games-llc/star-squadron/TQ5X9">Get launch updates</a>
+      </div>
+    </article>
+
+    <!-- Lost Robot -->
+    <article class="game flip">
+      <div class="game-art">
+        <div class="shots">
+          <img src="assets/lr-home.jpg" alt="Lost Robot world map screen">
+          <img src="assets/lr-gameplay.jpg" alt="Lost Robot puzzle gameplay screen">
+        </div>
+      </div>
+      <div class="game-body">
+        <span class="tag dev">In development</span>
+        <h3>Lost Robot</h3>
+        <p class="sub">A cozy puzzle journey · Mobile</p>
+        <p>A small robot is a long way from home. You don't steer it directly — you queue up a sequence of moves and turns, press GO, and watch it go. Get it wrong and you'll laugh; get it right and it feels like you taught it something.</p>
+        <ul>
+          <li>150 hand-tuned puzzles across nine chapters</li>
+          <li>No timers, no fail states worth dreading</li>
+          <li>Soft, handmade 3D art in every frame</li>
+        </ul>
+        <p style="color:var(--ink-3);font-size:14px;margin:0">Coming to iOS. Want to know when? <a href="#support">Drop us a line.</a></p>
+      </div>
+    </article>
+
+    <!-- Dungeon Brawler -->
+    <article class="game">
+      <div class="game-art">
+        <div class="cards-strip">
+          <img src="assets/db-logo.jpg" alt="Dungeon Brawler card back">
+          <img src="assets/db-card1.jpg" alt="Life Potion card from Dungeon Brawler">
+          <img src="assets/db-card4.jpg" alt="Mace weapon card from Dungeon Brawler">
+        </div>
+      </div>
+      <div class="game-body">
+        <span class="tag out">Released</span>
+        <h3>Dungeon Brawler</h3>
+        <p class="sub">Card game · Tabletop</p>
+        <p>Heroes shove their way through a dungeon that keeps rearranging itself, elbowing each other aside for the good loot. Build combos out of elements, potions and questionable tactics — then use them on your friends.</p>
+        <ul>
+          <li>143 illustrated cards</li>
+          <li>Combo-driven combat with elemental chaining</li>
+          <li>Also playable as a digital adaptation</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="archive">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>From the archive</h2>
+      <p>Older work that's no longer available, kept here because it happened.</p>
+    </div>
+    <div class="archive">
+      <span class="yr">2011</span>
+      <div>
+        <h3>Jet Fighter Ace: Secret Wars</h3>
+        <p>Our first mobile release, an arcade air-combat game published on the iOS App Store. It began life under the working name <em>Corsair</em>. Long since retired from the store, but it's where Hypercube Games started shipping.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="studio">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="sec-head" style="margin-bottom:20px">
+          <h2>The studio</h2>
+        </div>
+        <p>Hypercube Games is a small independent studio in Dublin, California, working across tabletop and digital. We've been at this since 2011, when our first mobile game went out on the App Store.</p>
+        <p>Everything here is made in-house — design, art direction, code, and the endless playtesting in between. We like games with a clean rule you can learn in a minute and consequences you're still thinking about an hour later.</p>
+      </div>
+      <div id="support">
+        <div class="sec-head" style="margin-bottom:20px">
+          <h2>Support &amp; contact</h2>
+        </div>
+        <p>Questions about a game, a rules dispute, press, or trouble with an app — email us and a real person will answer.</p>
+        <ul class="info">
+          <li><span class="k">Email</span><span class="v"><a href="mailto:support@hypercubegames.com">support@hypercubegames.com</a></span></li>
+          <li><span class="k">Location</span><span class="v">Dublin, California, USA</span></li>
+          <li><span class="k">Entity</span><span class="v">Hypercube Games, LLC</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 Hypercube Games, LLC. All rights reserved.</span>
+    <span><a href="privacy.html">Privacy Policy</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
