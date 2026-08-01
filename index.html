@@ -141,6 +141,36 @@
   .game ul{color:var(--ink-2);margin:0 0 22px;padding-left:20px}
   .game ul li{margin-bottom:5px}
 
+  /* ---------- launch countdown ---------- */
+  .launch{
+    background:linear-gradient(135deg,rgba(255,157,46,.10),rgba(255,157,46,.03));
+    border:1px solid rgba(255,157,46,.26);
+    border-radius:12px;padding:18px 20px;margin:0 0 22px;
+  }
+  .launch-date{
+    font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:650;margin-bottom:14px;
+  }
+  .countdown{display:flex;gap:10px}
+  .cd-unit{
+    flex:1;min-width:0;text-align:center;
+    background:rgba(0,0,0,.28);border:1px solid var(--line);
+    border-radius:9px;padding:10px 4px;
+  }
+  .cd-num{
+    display:block;font-size:26px;font-weight:750;color:var(--ink);
+    line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.5px;
+  }
+  .cd-lab{
+    display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-3);margin-top:3px;
+  }
+  .launch.live .launch-date{color:var(--accent);margin-bottom:0;font-size:15px;letter-spacing:0;text-transform:none}
+  @media(max-width:620px){
+    .cd-num{font-size:22px}
+    .countdown{gap:7px}
+  }
+
   /* screenshot strip */
   .shots{
     display:flex;gap:14px;padding:26px;background:#0d1018;overflow-x:auto;
@@ -237,6 +267,15 @@
           <li>Asymmetrical factions with their own ships and abilities</li>
           <li>Energy management across weapons, engines, and shields</li>
         </ul>
+        <div class="launch" id="launch" data-launch="2026-08-18T17:00:00Z">
+          <div class="launch-date" id="launch-label">Kickstarter launch · August 18, 2026</div>
+          <div class="countdown" id="countdown">
+            <div class="cd-unit"><span class="cd-num" data-unit="days">—</span><span class="cd-lab">days</span></div>
+            <div class="cd-unit"><span class="cd-num" data-unit="hours">—</span><span class="cd-lab">hours</span></div>
+            <div class="cd-unit"><span class="cd-num" data-unit="minutes">—</span><span class="cd-lab">mins</span></div>
+            <div class="cd-unit"><span class="cd-num" data-unit="seconds">—</span><span class="cd-lab">secs</span></div>
+          </div>
+        </div>
         <a class="btn" href="https://www.launchoracle.com/hypercube-games-llc/star-squadron/TQ5X9">Get launch updates</a>
       </div>
     </article>
@@ -335,5 +374,39 @@
   </div>
 </footer>
 
+<script>
+(function () {
+  var box = document.getElementById('launch');
+  if (!box) return;
+  var target = new Date(box.dataset.launch).getTime();
+  var label = document.getElementById('launch-label');
+  var grid  = document.getElementById('countdown');
+  var cells = {};
+  [].forEach.call(grid.querySelectorAll('[data-unit]'), function (el) {
+    cells[el.dataset.unit] = el;
+  });
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function tick() {
+    var left = target - Date.now();
+    if (left <= 0) {
+      box.classList.add('live');
+      label.textContent = 'Live now on Kickstarter — back it today.';
+      grid.style.display = 'none';
+      clearInterval(timer);
+      return;
+    }
+    var s = Math.floor(left / 1000);
+    cells.days.textContent    = Math.floor(s / 86400);
+    cells.hours.textContent   = pad(Math.floor(s % 86400 / 3600));
+    cells.minutes.textContent = pad(Math.floor(s % 3600 / 60));
+    cells.seconds.textContent = pad(s % 60);
+  }
+
+  tick();
+  var timer = setInterval(tick, 1000);
+})();
+</script>
 </body>
 </html>
