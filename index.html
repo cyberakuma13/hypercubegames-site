@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hypercube Games — Board games and video games from Dublin, California</title>
-<meta name="description" content="Hypercube Games, LLC is an independent game studio in Dublin, California. Makers of Star Squadron, Lost Robot, and Dungeon Brawler.">
+<meta name="description" content="Hypercube Games, LLC is an independent game studio in Dublin, California. Makers of Star Squadron, Robot GO!, and Dungeon Brawler.">
 <meta property="og:title" content="Hypercube Games">
 <meta property="og:description" content="An independent game studio in Dublin, California. Tabletop and digital.">
 <meta property="og:image" content="assets/ss-hero.jpg">
 <meta property="og:type" content="website">
-<link rel="icon" href="assets/lr-icon.png">
+<link rel="icon" href="assets/rg-icon.png">
 <style>
   :root{
     --bg:#0b0d14;
@@ -166,6 +166,25 @@
     color:var(--ink-3);margin-top:3px;
   }
   .launch.live .launch-date{color:var(--accent);margin-bottom:0;font-size:15px;letter-spacing:0;text-transform:none}
+
+  /* ---------- featured section: compact so it fits one screen ---------- */
+  .featured{padding:28px 0 34px}
+  .featured .sec-head{margin-bottom:16px}
+  .featured .sec-head h2{font-size:clamp(22px,2.8vw,28px);margin-bottom:5px}
+  .featured .sec-head p{font-size:15px}
+  .featured .game{margin-bottom:0}
+  .featured .game-body{padding:26px 30px 26px 6px}
+  .featured .game h3{font-size:24px}
+  .featured .game .sub{margin-bottom:12px}
+  .featured .game > .game-body > p{margin-bottom:14px;font-size:15px}
+  .featured .game ul{margin-bottom:16px;font-size:15px}
+  .featured .game ul li{margin-bottom:3px}
+  .featured .game-art img{min-height:0}
+  .featured .launch{padding:14px 16px;margin-bottom:16px}
+  .featured .launch-date{margin-bottom:10px;font-size:11px}
+  .featured .cd-unit{padding:7px 4px}
+  .featured .cd-num{font-size:21px}
+  .featured .btn{padding:11px 22px}
   @media(max-width:620px){
     .cd-num{font-size:22px}
     .countdown{gap:7px}
@@ -236,7 +255,6 @@
   <div class="wrap">
     <div class="sec-head">
       <h2>Our next game</h2>
-      <p>Our tactical starfighter board game, launching on Kickstarter this August.</p>
     </div>
 
     <!-- Star Squadron -->
@@ -246,7 +264,7 @@
         <span class="tag live">Coming to Kickstarter</span>
         <h3>Star Squadron</h3>
         <p class="sub">Tactical starfighter combat · Tabletop</p>
-        <p>A hex-based dogfighting board game where every pilot plans their maneuver in secret, then everyone moves at once. Bank, break, loop and slide through asteroid fields and nebulae — and hope you guessed right about where your opponent was going.</p>
+        <p>A hex-based dogfighting board game. Every pilot plans their maneuver in secret, then everyone moves at once — and hopes they guessed right about where the other guy was going.</p>
         <ul>
           <li>Simultaneous secret maneuver planning</li>
           <li>Asymmetrical factions with their own ships and abilities</li>
@@ -289,21 +307,21 @@
       <p>One in development, one on the shelf.</p>
     </div>
 
-    <!-- Lost Robot -->
+    <!-- Robot GO! -->
     <article class="game flip">
       <div class="game-art">
         <div class="shots">
-          <img src="assets/lr-home.jpg" alt="Lost Robot world map screen">
-          <img src="assets/lr-gameplay.jpg" alt="Lost Robot puzzle gameplay screen">
+          <img src="assets/rg-home.jpg" alt="Robot GO! level map winding through a toymaker's workshop">
+          <img src="assets/rg-gameplay.jpg" alt="Robot GO! puzzle board with movement commands queued below">
         </div>
       </div>
       <div class="game-body">
         <span class="tag dev">In development</span>
-        <h3>Lost Robot</h3>
+        <h3>Robot GO!</h3>
         <p class="sub">A cozy puzzle journey · Mobile</p>
-        <p>A small robot is a long way from home. You don't steer it directly — you queue up a sequence of moves and turns, press GO, and watch it go. Get it wrong and you'll laugh; get it right and it feels like you taught it something.</p>
+        <p>You don't steer the robot directly. You queue up a run of moves and turns, hit GO, and watch it go. Get it wrong and you'll laugh; get it right and it feels like you taught it something.</p>
         <ul>
-          <li>150 hand-tuned puzzles across nine chapters</li>
+          <li>Hundreds of hand-tuned puzzles</li>
           <li>No timers, no fail states worth dreading</li>
           <li>Soft, handmade 3D art in every frame</li>
         </ul>

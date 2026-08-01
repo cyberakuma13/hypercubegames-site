@@ -9,3 +9,9 @@ assets/lr-gameplay.png
 assets/ss-logo.png
 assets/db-card2.jpg
 assets/db-card3.jpg
+
+# Retired by the "Lost Robot" -> "Robot GO!" rename (2026-07-31).
+# Superseded by assets/rg-*; kept on disk, not deployed.
+assets/lr-home.jpg
+assets/lr-gameplay.jpg
+assets/lr-icon.png
