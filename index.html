@@ -120,12 +120,14 @@
     .game-art img{min-height:200px;max-height:320px}
   }
   @media(max-width:620px){
-    .shots,.cards-strip{
-      display:grid;gap:10px;padding:20px;overflow:visible;height:auto;
+    .shots{
+      display:grid;grid-template-columns:1fr 1fr;gap:10px;
+      padding:20px;overflow:visible;height:auto;
     }
-    .shots{grid-template-columns:1fr 1fr}
-    .cards-strip{grid-template-columns:repeat(3,1fr);gap:8px}
-    .shots img,.cards-strip img{width:100%;max-height:none;max-width:100%}
+    .shots img{width:100%;max-height:none;max-width:100%}
+    /* cards stay a horizontal scroller on phones — a 12-card grid would be four rows tall */
+    .cards-strip{padding:20px 20px 14px;gap:10px}
+    .cards-strip img{width:128px;max-height:none}
     .kicker{font-size:11px;letter-spacing:.1em}
   }
   .tag{
@@ -200,16 +202,27 @@
     min-height:0;height:auto;object-fit:contain;
   }
   .cards-strip{
-    display:flex;gap:12px;padding:26px;overflow-x:auto;
-    align-items:center;justify-content:safe center;height:100%;width:100%;min-width:0;max-width:100%;
+    display:flex;gap:12px;padding:26px 26px 18px;overflow-x:auto;
+    align-items:center;justify-content:flex-start;height:100%;width:100%;min-width:0;max-width:100%;
     background:radial-gradient(ellipse at center,#1b2132 0%,#0d1018 72%);
+    scroll-snap-type:x proximity;scrollbar-width:thin;
+    scrollbar-color:rgba(255,157,46,.5) rgba(255,255,255,.06);
   }
+  .cards-strip:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  /* full-width variant: a 12-card gallery needs the whole card, not half of it */
+  .game.wide{grid-template-columns:1fr;gap:0}
+  .game.wide .game-body{order:1;padding:36px 36px 4px}
+  .game.wide .game-art{order:2}
+  .cards-strip::-webkit-scrollbar{height:8px}
+  .cards-strip::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:99px}
+  .cards-strip::-webkit-scrollbar-thumb{background:rgba(255,157,46,.5);border-radius:99px}
+  .cards-strip::-webkit-scrollbar-thumb:hover{background:rgba(255,157,46,.75)}
   .cards-strip img{
-    width:148px;flex:none;border-radius:8px;height:auto;min-height:0;object-fit:contain;
-    box-shadow:0 10px 26px rgba(0,0,0,.6);
+    width:152px;flex:none;border-radius:8px;height:auto;min-height:0;object-fit:contain;
+    box-shadow:0 10px 26px rgba(0,0,0,.6);scroll-snap-align:center;
+    transition:transform .18s ease;
   }
-  .cards-strip img:nth-child(odd){transform:rotate(-2.5deg)}
-  .cards-strip img:nth-child(even){transform:rotate(2.5deg)}
+  .cards-strip img:hover{transform:translateY(-6px)}
 
   /* ---------- archive ---------- */
   .archive{
@@ -330,12 +343,21 @@
     </article>
 
     <!-- Dungeon Brawler -->
-    <article class="game">
+    <article class="game wide">
       <div class="game-art">
-        <div class="cards-strip">
-          <img src="assets/db-logo.jpg" alt="Dungeon Brawler card back">
-          <img src="assets/db-card1.jpg" alt="Life Potion card from Dungeon Brawler">
-          <img src="assets/db-card4.jpg" alt="Mace weapon card from Dungeon Brawler">
+        <div class="cards-strip" tabindex="0" role="region" aria-label="Dungeon Brawler cards — scroll for more">
+          <img src="assets/db-01.jpg" alt="Life Potion card" loading="lazy">
+          <img src="assets/db-02.jpg" alt="Bless card" loading="lazy">
+          <img src="assets/db-03.jpg" alt="Masterful Surge card" loading="lazy">
+          <img src="assets/db-04.jpg" alt="Falcon familiar card" loading="lazy">
+          <img src="assets/db-05.jpg" alt="Glaive weapon card" loading="lazy">
+          <img src="assets/db-06.jpg" alt="Bane spell card" loading="lazy">
+          <img src="assets/db-07.jpg" alt="Chimera boss card" loading="lazy">
+          <img src="assets/db-08.jpg" alt="Water Elemental monster card" loading="lazy">
+          <img src="assets/db-09.jpg" alt="Orc Warrior monster card" loading="lazy">
+          <img src="assets/db-10.jpg" alt="Imp Acolyte monster card" loading="lazy">
+          <img src="assets/db-11.jpg" alt="Kliffforge hero card" loading="lazy">
+          <img src="assets/db-12.jpg" alt="Fah Zhur hero card" loading="lazy">
         </div>
       </div>
       <div class="game-body">
