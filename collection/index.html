@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vault — Hypercube Collection Manager</title>
+<meta name="description" content="Track your books, movies, video games, board games, action figures, comics, and more. Local-first collection manager by Hypercube Games.">
+<meta name="theme-color" content="#0b0d14">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="app">
+  <div class="topbar">
+    <a class="brand" href="./"><span class="cube">⬡</span> Vault <small>· Hypercube</small></a>
+    <div class="searchwrap">
+      <span class="mag">⌕</span>
+      <input id="search" type="search" placeholder="Search your collection…  ( / )" autocomplete="off">
+    </div>
+    <div class="topbtns">
+      <button class="btn primary" id="btn-add">+ Add</button>
+      <button class="btn" id="btn-import">Import</button>
+      <button class="btn icon" id="btn-stats" title="Stats">📊</button>
+      <button class="btn icon" id="btn-settings" title="Settings">⚙︎</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="side" id="sidebar"></aside>
+  <main>
+    <div class="toolbar" id="toolbar"></div>
+    <div id="items"></div>
+  </main>
+</div>
+
+<footer class="app">
+  Everything is stored locally in your browser (IndexedDB) — export a JSON backup regularly from ⚙︎ Settings.
+  · <a href="/">hypercubegames.com</a>
+</footer>
+
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script type="module" src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
