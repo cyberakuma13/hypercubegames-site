@@ -74,13 +74,17 @@ def main():
     if a.dry_run:
         print(post['caption']); return
 
-    c = api(f'{ig}/media', {'image_url': url, 'caption': post['caption'], 'access_token': tok}, 'POST')
+    if post.get('type') == 'reel':
+        c = api(f'{ig}/media', {'media_type': 'REELS', 'video_url': url, 'caption': post['caption'],
+                                 'share_to_feed': 'true', 'access_token': tok}, 'POST')
+    else:
+        c = api(f'{ig}/media', {'image_url': url, 'caption': post['caption'], 'access_token': tok}, 'POST')
     cid = c['id']
-    for _ in range(20):
+    for _ in range(60):
         st = api(cid, {'fields': 'status_code,status', 'access_token': tok})
         if st.get('status_code') == 'FINISHED': break
         if st.get('status_code') == 'ERROR': raise SystemExit(f'container error: {st}')
-        time.sleep(3)
+        time.sleep(5)
     pub = api(f'{ig}/media_publish', {'creation_id': cid, 'access_token': tok}, 'POST')
     mid = pub['id']
     info = api(mid, {'fields': 'permalink', 'access_token': tok})
