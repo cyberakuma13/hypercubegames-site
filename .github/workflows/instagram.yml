@@ -4,6 +4,8 @@ on:
     # 09:00 America/Los_Angeles on Mon/Wed/Fri = 16:00 UTC during PDT.
     # After the November clock change (PST) this becomes 17:00 UTC; adjust then.
     - cron: '0 16 * * 1,3,5'
+    # Final week of the campaign (Sep 11-17): post every day
+    - cron: '0 16 11-17 9 *'
   workflow_dispatch:
     inputs:
       post_id:
