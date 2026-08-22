@@ -1,0 +1,45 @@
+name: Instagram poster
+on:
+  schedule:
+    # 09:00 America/Los_Angeles on Mon/Wed/Fri = 16:00 UTC during PDT.
+    # After the November clock change (PST) this becomes 17:00 UTC; adjust then.
+    - cron: '0 16 * * 1,3,5'
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: 'Post id to publish now (optional, e.g. 03_eisenkiesel)'
+        required: false
+      dry_run:
+        description: 'Dry run (no publish)'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python ig/publish.py --check
+      - name: Publish
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          POST_ID: ${{ inputs.post_id }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS=""
+          if [ -n "$POST_ID" ]; then ARGS="--id $POST_ID --force"; fi
+          if [ "$DRY_RUN" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python ig/publish.py $ARGS | tee result.txt
+      - name: Record result in queue.json
+        run: |
+          git config user.name "ig-poster"
+          git config user.email "noreply@hypercubegames.com"
+          git add ig/queue.json
+          if git diff --cached --quiet; then echo "nothing published"; else git commit -m "IG: $(grep PUBLISHED result.txt)" && git push; fi

@@ -1,0 +1,29 @@
+name: Instagram token refresh
+on:
+  schedule:
+    - cron: '0 12 1,15 * *'   # 1st and 15th of each month; tokens last 60 days
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refresh
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          NEW_TOKEN_FILE: new_token.txt
+        run: python ig/publish.py --refresh
+      - name: Store refreshed token as repo secret
+        env:
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+        run: |
+          if [ -n "$GH_TOKEN" ]; then
+            gh secret set IG_ACCESS_TOKEN < new_token.txt
+          else
+            echo "::warning::REPO_ADMIN_TOKEN not set; token was refreshed server-side but the secret was not updated. Re-paste the token before it expires."
+          fi
