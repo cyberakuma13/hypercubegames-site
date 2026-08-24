@@ -14,6 +14,7 @@ import json, sys, time, datetime, argparse, urllib.request, urllib.parse, os, zo
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 G = 'https://graph.instagram.com/v21.0'
+FBG = 'https://graph.facebook.com/v21.0'
 
 def api(path, params=None, method='GET'):
     params = dict(params or {})
@@ -29,6 +30,54 @@ def api(path, params=None, method='GET'):
         body = e.read().decode()
         raise SystemExit(f'Graph API error {e.code}: {body}')
 
+def fbapi(path, params=None, method='GET'):
+    """Call the Facebook Graph API (separate host from the Instagram one)."""
+    params = dict(params or {})
+    data = urllib.parse.urlencode(params).encode()
+    if method == 'GET':
+        req = urllib.request.Request(f'{FBG}/{path}?{data.decode()}')
+    else:
+        req = urllib.request.Request(f'{FBG}/{path}', data=data, method='POST')
+    with urllib.request.urlopen(req, timeout=120) as r:
+        return json.load(r)
+
+def fb_page_token(sys_token, page_id=None):
+    """Exchange the never-expiring system-user token for this Page's token."""
+    r = fbapi('me/accounts', {'fields': 'id,name,access_token,tasks', 'access_token': sys_token})
+    pages = r.get('data', [])
+    if not pages:
+        raise RuntimeError('system user has no Pages assigned')
+    if page_id:
+        pages = [p for p in pages if p['id'] == str(page_id)] or pages
+    return pages[0]['id'], pages[0]['access_token'], pages[0]['name']
+
+def fb_publish(post, url, caption):
+    """Mirror a post to the Facebook Page. Never fatal: IG is the primary channel."""
+    sys_token = os.environ.get('FB_ACCESS_TOKEN')
+    if not sys_token:
+        print('FB: no FB_ACCESS_TOKEN, skipping'); return None
+    try:
+        pid, ptok, pname = fb_page_token(sys_token, os.environ.get('FB_PAGE_ID'))
+        if post.get('type') == 'reel':
+            r = fbapi(f'{pid}/videos', {'file_url': url, 'description': caption,
+                                        'access_token': ptok}, 'POST')
+            oid = r.get('id')
+            link = f'https://www.facebook.com/{pid}/videos/{oid}' if oid else None
+        else:
+            r = fbapi(f'{pid}/photos', {'url': url, 'caption': caption,
+                                        'published': 'true', 'access_token': ptok}, 'POST')
+            oid = r.get('post_id') or r.get('id')
+            link = f'https://www.facebook.com/{oid}' if oid else None
+        print(f'FB: posted to {pname} -> {link}')
+        return link
+    except Exception as e:
+        detail = ''
+        if isinstance(e, urllib.error.HTTPError):
+            try: detail = e.read().decode()[:500]
+            except Exception: pass
+        print(f'FB: FAILED ({e}) {detail}')
+        return None
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--check', action='store_true')
@@ -36,6 +85,9 @@ def main():
     ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--id')
     ap.add_argument('--force', action='store_true')
+    ap.add_argument('--fb-check', action='store_true')
+    ap.add_argument('--no-fb', action='store_true')
+    ap.add_argument('--fb-only', action='store_true', help='mirror an already-published post to Facebook only')
     a = ap.parse_args()
 
     cfg = json.load(open(f'{HERE}/config.json')) if os.path.exists(f'{HERE}/config.json') else {}
@@ -44,6 +96,12 @@ def main():
     if os.environ.get('IG_ACCESS_TOKEN'): cfg['access_token'] = os.environ['IG_ACCESS_TOKEN']
     tok, ig = cfg['access_token'], cfg['ig_user_id']
 
+    if a.fb_check:
+        st = os.environ.get('FB_ACCESS_TOKEN')
+        if not st: raise SystemExit('FB_ACCESS_TOKEN not set')
+        pid, ptok, pname = fb_page_token(st, os.environ.get('FB_PAGE_ID'))
+        print(f'FB OK: {pname} (id {pid})')
+        return
     if a.check:
         me = api('me', {'fields': 'username,followers_count,media_count', 'access_token': tok})
         print(f"OK @{me['username']}  followers={me['followers_count']}  posts={me['media_count']}")
@@ -74,6 +132,14 @@ def main():
     if a.dry_run:
         print(post['caption']); return
 
+    if a.fb_only:
+        fb_link = fb_publish(post, url, post['caption'])
+        if fb_link:
+            post['fb_permalink'] = fb_link
+            json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
+            print(f"PUBLISHED {post['id']} -> {fb_link}")
+        return
+
     if post.get('type') == 'reel':
         c = api(f'{ig}/media', {'media_type': 'REELS', 'video_url': url, 'caption': post['caption'],
                                  'share_to_feed': 'true', 'access_token': tok}, 'POST')
@@ -89,6 +155,9 @@ def main():
     mid = pub['id']
     info = api(mid, {'fields': 'permalink', 'access_token': tok})
     post['status'] = 'published'; post['published_at'] = datetime.datetime.now(tz).isoformat(); post['permalink'] = info.get('permalink')
+    if not a.no_fb:
+        fb_link = fb_publish(post, url, post['caption'])
+        if fb_link: post['fb_permalink'] = fb_link
     json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
     print(f"PUBLISHED {post['id']} -> {info.get('permalink')}")
 
