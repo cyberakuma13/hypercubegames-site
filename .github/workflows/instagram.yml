@@ -19,6 +19,10 @@ on:
         description: 'Dry run (no publish)'
         type: boolean
         default: false
+      fb_only:
+        description: 'Mirror an already-published post to Facebook only'
+        type: boolean
+        default: false
 permissions:
   contents: write
 jobs:
@@ -36,16 +40,20 @@ jobs:
       - name: Publish
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+          FB_PAGE_ID: '349947451543285'
           POST_ID: ${{ inputs.post_id }}
           DRY_RUN: ${{ inputs.dry_run }}
+          FB_ONLY: ${{ inputs.fb_only }}
         run: |
           ARGS=""
           if [ -n "$POST_ID" ]; then ARGS="--id $POST_ID --force"; fi
           if [ "$DRY_RUN" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ "$FB_ONLY" = "true" ]; then ARGS="$ARGS --fb-only"; fi
           python ig/publish.py $ARGS | tee result.txt
       - name: Record result in queue.json
         run: |
           git config user.name "ig-poster"
           git config user.email "noreply@hypercubegames.com"
           git add ig/queue.json
-          if git diff --cached --quiet; then echo "nothing published"; else git commit -m "IG: $(grep PUBLISHED result.txt)" && git push; fi
+          if git diff --cached --quiet; then echo "nothing published"; else git commit -m "post: $(grep PUBLISHED result.txt)" && git push; fi
