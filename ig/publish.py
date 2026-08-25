@@ -10,7 +10,7 @@ Env / config (config.json next to this file):
   {"ig_user_id": "...", "access_token": "...", "image_base_url": "https://hypercubegames.com/ig/"}
 Images must be publicly reachable JPEGs at image_base_url + post.image.
 """
-import json, sys, time, datetime, argparse, urllib.request, urllib.parse, os, zoneinfo
+import json, sys, time, re, datetime, argparse, urllib.request, urllib.parse, os, zoneinfo
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 G = 'https://graph.instagram.com/v21.0'
@@ -50,6 +50,15 @@ def fb_page_token(sys_token, page_id=None):
     if page_id:
         pages = [p for p in pages if p['id'] == str(page_id)] or pages
     return pages[0]['id'], pages[0]['access_token'], pages[0]['name']
+
+BIO_RE = re.compile(r'[.,:]?\s*(?:Kickstarter )?[Ll]ink in bio\.?')
+
+def fb_caption(caption, campaign_url):
+    """Instagram's 'link in bio' means nothing on Facebook, where links are clickable.
+    Swap the phrase for the real campaign URL."""
+    if not campaign_url or not BIO_RE.search(caption):
+        return caption
+    return BIO_RE.sub(': ' + campaign_url, caption, count=1)
 
 def fb_publish(post, url, caption):
     """Mirror a post to the Facebook Page. Never fatal: IG is the primary channel."""
@@ -133,7 +142,7 @@ def main():
         print(post['caption']); return
 
     if a.fb_only:
-        fb_link = fb_publish(post, url, post['caption'])
+        fb_link = fb_publish(post, url, fb_caption(post['caption'], q.get('campaign_url')))
         if fb_link:
             post['fb_permalink'] = fb_link
             json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
@@ -156,7 +165,7 @@ def main():
     info = api(mid, {'fields': 'permalink', 'access_token': tok})
     post['status'] = 'published'; post['published_at'] = datetime.datetime.now(tz).isoformat(); post['permalink'] = info.get('permalink')
     if not a.no_fb:
-        fb_link = fb_publish(post, url, post['caption'])
+        fb_link = fb_publish(post, url, fb_caption(post['caption'], q.get('campaign_url')))
         if fb_link: post['fb_permalink'] = fb_link
     json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
     print(f"PUBLISHED {post['id']} -> {info.get('permalink')}")
