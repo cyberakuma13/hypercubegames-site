@@ -41,15 +41,17 @@ def fbapi(path, params=None, method='GET'):
     with urllib.request.urlopen(req, timeout=120) as r:
         return json.load(r)
 
-def fb_page_token(sys_token, page_id=None):
-    """Exchange the never-expiring system-user token for this Page's token."""
+def fb_pages(sys_token, page_ids=None):
+    """Every Page this system user can post to. Add a Page to the business
+    portfolio and assign it to the system user and it shows up here — no code change."""
     r = fbapi('me/accounts', {'fields': 'id,name,access_token,tasks', 'access_token': sys_token})
-    pages = r.get('data', [])
+    pages = [p for p in r.get('data', []) if 'CREATE_CONTENT' in (p.get('tasks') or [])]
     if not pages:
-        raise RuntimeError('system user has no Pages assigned')
-    if page_id:
-        pages = [p for p in pages if p['id'] == str(page_id)] or pages
-    return pages[0]['id'], pages[0]['access_token'], pages[0]['name']
+        raise RuntimeError('system user has no Pages with content access')
+    if page_ids:
+        want = {x.strip() for x in page_ids.split(',') if x.strip()}
+        pages = [p for p in pages if p['id'] in want] or pages
+    return pages
 
 BIO_RE = re.compile(r'[.,:]?\s*(?:Kickstarter )?[Ll]ink in bio\.?')
 
@@ -61,31 +63,39 @@ def fb_caption(caption, campaign_url):
     return BIO_RE.sub(': ' + campaign_url, caption, count=1)
 
 def fb_publish(post, url, caption):
-    """Mirror a post to the Facebook Page. Never fatal: IG is the primary channel."""
+    """Mirror a post to every connected Facebook Page.
+    Never fatal, and never all-or-nothing: one Page failing can't stop the others."""
     sys_token = os.environ.get('FB_ACCESS_TOKEN')
     if not sys_token:
         print('FB: no FB_ACCESS_TOKEN, skipping'); return None
     try:
-        pid, ptok, pname = fb_page_token(sys_token, os.environ.get('FB_PAGE_ID'))
-        if post.get('type') == 'reel':
-            r = fbapi(f'{pid}/videos', {'file_url': url, 'description': caption,
-                                        'access_token': ptok}, 'POST')
-            oid = r.get('id')
-            link = f'https://www.facebook.com/{pid}/videos/{oid}' if oid else None
-        else:
-            r = fbapi(f'{pid}/photos', {'url': url, 'caption': caption,
-                                        'published': 'true', 'access_token': ptok}, 'POST')
-            oid = r.get('post_id') or r.get('id')
-            link = f'https://www.facebook.com/{oid}' if oid else None
-        print(f'FB: posted to {pname} -> {link}')
-        return link
+        pages = fb_pages(sys_token, os.environ.get('FB_PAGE_IDS') or os.environ.get('FB_PAGE_ID'))
     except Exception as e:
-        detail = ''
-        if isinstance(e, urllib.error.HTTPError):
-            try: detail = e.read().decode()[:500]
-            except Exception: pass
-        print(f'FB: FAILED ({e}) {detail}')
-        return None
+        print(f'FB: could not list Pages ({e})'); return None
+
+    links = []
+    for pg in pages:
+        pid, ptok, pname = pg['id'], pg['access_token'], pg['name']
+        try:
+            if post.get('type') == 'reel':
+                r = fbapi(f'{pid}/videos', {'file_url': url, 'description': caption,
+                                            'access_token': ptok}, 'POST')
+                oid = r.get('id')
+                link = f'https://www.facebook.com/{pid}/videos/{oid}' if oid else None
+            else:
+                r = fbapi(f'{pid}/photos', {'url': url, 'caption': caption,
+                                            'published': 'true', 'access_token': ptok}, 'POST')
+                oid = r.get('post_id') or r.get('id')
+                link = f'https://www.facebook.com/{oid}' if oid else None
+            print(f'FB: posted to {pname} ({pid}) -> {link}')
+            if link: links.append(link)
+        except Exception as e:
+            detail = ''
+            if isinstance(e, urllib.error.HTTPError):
+                try: detail = e.read().decode()[:400]
+                except Exception: pass
+            print(f'FB: FAILED on {pname} ({pid}): {e} {detail}')
+    return links or None
 
 def main():
     ap = argparse.ArgumentParser()
@@ -108,8 +118,9 @@ def main():
     if a.fb_check:
         st = os.environ.get('FB_ACCESS_TOKEN')
         if not st: raise SystemExit('FB_ACCESS_TOKEN not set')
-        pid, ptok, pname = fb_page_token(st, os.environ.get('FB_PAGE_ID'))
-        print(f'FB OK: {pname} (id {pid})')
+        pages = fb_pages(st, os.environ.get('FB_PAGE_IDS') or os.environ.get('FB_PAGE_ID'))
+        print(f'FB OK: {len(pages)} page(s) will receive posts')
+        for pg in pages: print(f"  - {pg['name']} (id {pg['id']})")
         return
     if a.check:
         me = api('me', {'fields': 'username,followers_count,media_count', 'access_token': tok})
@@ -144,7 +155,7 @@ def main():
     if a.fb_only:
         fb_link = fb_publish(post, url, fb_caption(post['caption'], q.get('campaign_url')))
         if fb_link:
-            post['fb_permalink'] = fb_link
+            post['fb_permalink'] = fb_link if len(fb_link) > 1 else fb_link[0]
             json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
             print(f"PUBLISHED {post['id']} -> {fb_link}")
         return
@@ -166,7 +177,7 @@ def main():
     post['status'] = 'published'; post['published_at'] = datetime.datetime.now(tz).isoformat(); post['permalink'] = info.get('permalink')
     if not a.no_fb:
         fb_link = fb_publish(post, url, fb_caption(post['caption'], q.get('campaign_url')))
-        if fb_link: post['fb_permalink'] = fb_link
+        if fb_link: post['fb_permalink'] = fb_link if len(fb_link) > 1 else fb_link[0]
     json.dump(q, open(f'{HERE}/queue.json', 'w'), indent=1, ensure_ascii=False)
     print(f"PUBLISHED {post['id']} -> {info.get('permalink')}")
 
