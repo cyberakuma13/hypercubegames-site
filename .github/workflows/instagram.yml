@@ -1,19 +1,26 @@
 name: Instagram poster
 on:
   schedule:
-    # 09:00 America/Los_Angeles on Mon/Wed/Fri = 16:00 UTC during PDT.
-    # After the November clock change (PST) this becomes 17:00 UTC; adjust then.
-    - cron: '0 16 * * 1,3,5'
-    # Thursdays: reels
-    - cron: '0 16 * * 4'
-    # Final week of the campaign (Sep 11-17): post every day
-    - cron: '0 16 11-16 9 *'
-    # Campaign closes Sep 17 at 09:00 PT: final post goes out at 06:00 PT (13:00 UTC)
-    - cron: '0 13 17 9 *'
-    # Safety net: GitHub silently drops scheduled runs under load. This daily
-    # sweep at 12:00 PT publishes anything still due and unpublished. If the
-    # morning run already went out, publish.py finds nothing due and exits.
-    - cron: '0 19 * * *'
+    # publish.py only ever publishes posts dated today or earlier, and marks
+    # them published as it goes, so every run after the first is a ~12s no-op.
+    # That makes it safe to fire repeatedly. GitHub silently drops individual
+    # scheduled runs under load — through Aug 27/28/31 the single 09:00 slot was
+    # dropped three posting days running — so redundancy is the only defence.
+    # Times are UTC; subtract 7 hours for Pacific while PDT is in effect.
+    # (After the November clock change that becomes 8 hours. Campaign ends Sep 17.)
+    - cron: '0 16 * * *'    # 09:00 PT — the intended slot
+    - cron: '30 16 * * *'   # 09:30 PT
+    - cron: '0 17 * * *'    # 10:00 PT
+    - cron: '0 18 * * *'    # 11:00 PT
+    - cron: '0 20 * * *'    # 13:00 PT
+    - cron: '0 23 * * *'    # 16:00 PT — last chance to land same day
+    # Sep 17: the campaign closes at 09:00 PT, so the final post has to be up
+    # before that. Extra shots because there is no second chance on this one.
+    - cron: '0 12 17 9 *'   # 05:00 PT
+    - cron: '30 12 17 9 *'  # 05:30 PT
+    - cron: '0 13 17 9 *'   # 06:00 PT
+    - cron: '30 13 17 9 *'  # 06:30 PT
+    - cron: '0 14 17 9 *'   # 07:00 PT
   workflow_dispatch:
     inputs:
       post_id:
