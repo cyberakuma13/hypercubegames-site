@@ -1,4 +1,32 @@
 {
   "schema": 1,
-  "experiments": {}
+  "experiments": {
+    "guided_intro": {
+      "status": "running",
+      "start": "2026-10-27",
+      "audience": "new",
+      "arms": {
+        "control": 50,
+        "guided": 50
+      }
+    },
+    "retry_nudge": {
+      "status": "running",
+      "start": "2026-10-27",
+      "audience": "new",
+      "arms": {
+        "control": 50,
+        "nudge": 50
+      }
+    },
+    "easy_start": {
+      "status": "running",
+      "start": "2026-10-27",
+      "audience": "new",
+      "arms": {
+        "control": 50,
+        "easy": 50
+      }
+    }
+  }
 }
