@@ -2,13 +2,14 @@
   "schema": 1,
   "experiments": {
     "guided_intro": {
-      "status": "running",
+      "status": "off",
       "start": "2026-10-27",
       "audience": "new",
       "arms": {
         "control": 50,
         "guided": 50
-      }
+      },
+      "ended": "2026-11-09"
     },
     "retry_nudge": {
       "status": "promoted",
